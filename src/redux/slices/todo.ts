@@ -29,11 +29,20 @@ const todoSlice = createSlice({
         return todo;
       });
     },
+    editTodo: (state, action: PayloadAction<{ id: string; title: string }>) => {
+      state.todoList = state.todoList.map((todo) => {
+        if (todo.id === action.payload.id) {
+          todo.title = action.payload.title;
+        }
+        return todo;
+      });
+    },
   },
 });
 
 // export const { increment, decrement, incrementByAmount } = counterSlice.actions;
-export const { addTodo, removeTodo, markComplete } = todoSlice.actions;
+export const { addTodo, removeTodo, markComplete, editTodo } =
+  todoSlice.actions;
 // Other code such as selectors can use the imported `RootState` type
 
 export default todoSlice.reducer;

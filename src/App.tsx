@@ -11,9 +11,11 @@ import { useAppDispatch, useAppSelector } from "./redux/hooks/hooks";
 import { v4 as uuidv4 } from "uuid";
 import { addTodo, markComplete, removeTodo } from "./redux/slices/todo";
 import { RootState } from "./redux/storeToolkit";
+import SimpleDialog from "./components/Dialog";
 function App() {
   const [todo, setTodo] = useState<string>("");
-
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>();
+  const [selectedTodoEdit, setSelectedTodoEdit] = useState<string>("");
   const dispatch = useAppDispatch();
   const { todoList } = useAppSelector((state: RootState) => state);
   const handleSubmit = () => {
@@ -23,7 +25,7 @@ function App() {
       completed: false,
       title: todo,
     };
-    dispatch(addTodo(newTodo));
+    if (todo !== "") dispatch(addTodo(newTodo));
     setTodo("");
   };
   const handleMarkComplete = (item: Todo) => {
@@ -31,6 +33,18 @@ function App() {
   };
   const handleDelete = (item: Todo) => {
     dispatch(removeTodo(item));
+  };
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = (item: Todo) => {
+    setOpen(true);
+    setSelectedTodo(item);
+    setSelectedTodoEdit(item.title);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -57,24 +71,34 @@ function App() {
             Add todo List
           </Button>
         </Container>
-        <Container className="flex">
+        <Container className="flex ">
           {todoList?.map((item) => (
-            <div key={item.id} className="flex space-x-2">
+            <div
+              key={item.id}
+              className="flex space-x-2 items-center space-y-2"
+            >
               <input
                 onClick={() => handleMarkComplete(item)}
                 checked={item.completed}
                 type="checkbox"
               />
               <p>{item.title}</p>
-              <button
-                className="w-10 bg-red-300"
-                onClick={() => handleDelete(item)}
-              >
+              <Button variant="outlined" onClick={() => handleClickOpen(item)}>
+                Edit
+              </Button>
+              <Button variant="outlined" onClick={() => handleDelete(item)}>
                 Delete{" "}
-              </button>
+              </Button>
             </div>
           ))}
         </Container>
+        <SimpleDialog
+          Selected={selectedTodoEdit as string}
+          item={selectedTodo as Todo}
+          open={open}
+          onClose={handleClose}
+          setSelected={setSelectedTodoEdit}
+        />
       </Container>
     </div>
   );
